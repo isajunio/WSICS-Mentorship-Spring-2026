@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  --bg:         #000000;
-  --surface:    #111111;
-  --surface2:   #1a1a1a;
-  --border:     rgba(255, 255, 255, 0.08);
-  --accent:     #FF3D5A;
+  --bg:         #c76ace;  /*#f7aefc;*/
+  --surface:    #eb92f1; /*for mood bar and bpm bar number (rectangle obj)*/
+  --surface2:   #000000;
+  --border:     rgba(130, 106, 106, 0.307);
+  --accent:     #ffffff;
   --accent2:    #FF8C32;
   --text:       #ffffff;
-  --text2:      #aaaaaa;
-  --text3:      #666666;
+  --text2:      #000000; /*for enter your heart... "bpm" "calm&easy relax"*/
+  --text3:      #000000f3; /*FOR powered by spotify and numbers on bpm bar*/
   --font-body:  'DM Sans', sans-serif;
   --font-mono:  'Space Mono', monospace;
   --radius:     14px;
