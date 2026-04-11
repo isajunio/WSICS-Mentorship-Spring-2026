@@ -1,6 +1,7 @@
 const CLIENT_ID    = import.meta.env.VITE_SPOTIFY_CLIENT_ID || ''
 const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI      || 'http://127.0.0.1:5173/'
 const SCOPES       = 'user-read-email user-read-private'
+let refreshInFlight = null
 
 // ── PKCE ──────────────────────────────────────────────────────
 function generateRandom(length = 64) {
@@ -39,7 +40,10 @@ export async function exchangeCodeForToken(code) {
       code, redirect_uri: REDIRECT_URI, code_verifier: verifier,
     }),
   })
-  if (!res.ok) throw new Error(`Token exchange failed: ${res.status}`)
+  if (!res.ok) {
+    const details = await res.text().catch(() => '')
+    throw new Error(`Token exchange failed: ${res.status}${details ? ` - ${details}` : ''}`)
+  }
   const data = await res.json()
   localStorage.setItem('sp_access_token',  data.access_token)
   localStorage.setItem('sp_refresh_token', data.refresh_token)
@@ -49,19 +53,32 @@ export async function exchangeCodeForToken(code) {
 }
 
 async function refreshAccessToken() {
+  if (refreshInFlight) return refreshInFlight
+
   const rt = localStorage.getItem('sp_refresh_token')
   if (!rt) return null
-  const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: rt, client_id: CLIENT_ID }),
-  })
-  if (!res.ok) { logout(); return null }
-  const data = await res.json()
-  localStorage.setItem('sp_access_token', data.access_token)
-  localStorage.setItem('sp_expires_at',   String(Date.now() + data.expires_in * 1000))
-  if (data.refresh_token) localStorage.setItem('sp_refresh_token', data.refresh_token)
-  return data.access_token
+
+  refreshInFlight = (async () => {
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ grant_type: 'refresh_token', refresh_token: rt, client_id: CLIENT_ID }),
+    })
+
+    if (!res.ok) { logout(); return null }
+
+    const data = await res.json()
+    localStorage.setItem('sp_access_token', data.access_token)
+    localStorage.setItem('sp_expires_at',   String(Date.now() + data.expires_in * 1000))
+    if (data.refresh_token) localStorage.setItem('sp_refresh_token', data.refresh_token)
+    return data.access_token
+  })()
+
+  try {
+    return await refreshInFlight
+  } finally {
+    refreshInFlight = null
+  }
 }
 
 export async function getValidToken() {
@@ -79,9 +96,46 @@ async function apiFetch(endpoint, params = {}) {
   const token = await getValidToken()
   if (!token) throw new Error('Not authenticated')
   const url = new URL(`https://api.spotify.com/v1${endpoint}`)
-  Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, v))
-  const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-  if (!res.ok) throw new Error(`API error ${res.status}`)
+  Object.entries(params).forEach(([k,v]) => {
+    if (v !== undefined && v !== null) url.searchParams.set(k, v)
+  })
+
+  const send = accessToken => fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } })
+  let res = await send(token)
+
+  if ((res.status === 401 || res.status === 403) && localStorage.getItem('sp_refresh_token')) {
+    const refreshedToken = await refreshAccessToken()
+    if (refreshedToken) res = await send(refreshedToken)
+  }
+
+  if (!res.ok) {
+    let detail = ''
+    try {
+      const data = await res.json()
+      detail = data?.error?.message || data?.error_description || ''
+    } catch {
+      detail = await res.text().catch(() => '')
+    }
+
+    if (res.status === 401) {
+      logout()
+      throw new Error(
+        detail
+          ? `Spotify authorization failed (${res.status}): ${detail}. Please sign in again.`
+          : `Spotify authorization failed (${res.status}). Please sign in again.`
+      )
+    }
+
+    if (res.status === 403) {
+      throw new Error(
+        detail
+          ? `Spotify API forbidden (403): ${detail}. If your app is in Development mode, add your Spotify account in Spotify Dashboard → Users and Access, then re-authenticate.`
+          : 'Spotify API forbidden (403). If your app is in Development mode, add your Spotify account in Spotify Dashboard → Users and Access, then re-authenticate.'
+      )
+    }
+
+    throw new Error(detail ? `API error ${res.status}: ${detail}` : `API error ${res.status}`)
+  }
   return res.json()
 }
 
@@ -118,22 +172,43 @@ function normalize(track) {
   }
 }
 
+async function searchTracks(q) {
+  const limits = [20, 10, 5, 1]
+  let lastErr = null
+
+  for (const limit of limits) {
+    try {
+      const data = await apiFetch('/search', { q, type: 'track', limit, market: 'from_token' })
+      return data?.tracks?.items || []
+    } catch (err) {
+      lastErr = err
+      if (!/invalid limit/i.test(String(err?.message || ''))) throw err
+    }
+  }
+
+  throw lastErr || new Error('Spotify search failed')
+}
+
 // ── Main export ───────────────────────────────────────────────
 export async function fetchTracksByBPM(bpm) {
   const terms = getSearchTerms(bpm)
-
-  // Run all searches in parallel
-  const results = await Promise.all(
-    terms.map(q =>
-      apiFetch('/search', { q, type: 'track', limit: 50, market: 'US' })
-        .then(d => d.tracks?.items || [])
-        .catch(() => [])
-    )
+  await searchTracks(terms[0])
+  const results = await Promise.allSettled(
+    terms.map(q => searchTracks(q))
   )
+
+  const firstFailure = results.find(r => r.status === 'rejected')
+  if (firstFailure) {
+    throw firstFailure.reason instanceof Error
+      ? firstFailure.reason
+      : new Error(String(firstFailure.reason || 'Spotify search failed'))
+  }
+
+  const items = results.map(r => r.value || [])
 
   // Deduplicate and sort by popularity
   const seen   = new Set()
-  const tracks = results.flat()
+  const tracks = items.flat()
     .filter(t => {
       if (!t?.id || seen.has(t.id)) return false
       seen.add(t.id)
