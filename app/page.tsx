@@ -6,9 +6,11 @@ import { ArduinoBpm } from "@/components/arduino-bpm"
 import { SongsView } from "@/components/songs-view"
 import { VisualizerView } from "@/components/visualizer-view"
 import { PixelBackground } from "@/components/pixel-background"
+import { Login } from "@/components/login"
+import { Signup } from "@/components/signup"
 import { type Song } from "@/lib/itunes"
 
-type View = "home" | "songs" | "visualizer"
+type View = "home" | "songs" | "visualizer" | "data"
 
 export default function HomePage() {
   const [view,         setView]         = useState<View>("home")
@@ -45,7 +47,30 @@ export default function HomePage() {
       <Header />
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 pt-24 pb-20 relative z-10">
-
+        <div className="flex gap-3 w-full max-w-2xl mb-8">
+          <button 
+            className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
+            style={{
+                background: '#ff6b9d',
+                color: '#000',
+                borderColor: '#ff6b9d',
+                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
+                padding: '10px', 
+            }}>
+            LOGIN
+         </button>
+          <button 
+            className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
+            style={{
+                background: '#ff6b9d',
+                color: '#000',
+                borderColor: '#ff6b9d',
+                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
+                padding: '10px', 
+            }}>
+            SIGNUP
+         </button>
+        </div>
         {/* Hero */}
         <div className="text-center mb-10 max-w-2xl">
           <p className="font-mono text-xs md:text-sm text-primary tracking-[0.3em] uppercase mb-4">
