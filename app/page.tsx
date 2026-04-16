@@ -5,6 +5,7 @@ import { Header } from "@/components/header"
 import { ArduinoBpm } from "@/components/arduino-bpm"
 import { SongsView } from "@/components/songs-view"
 import { VisualizerView } from "@/components/visualizer-view"
+import { DataView } from "@/components/data-view"
 import { PixelBackground } from "@/components/pixel-background"
 import { Login } from "@/components/login"
 import { Signup } from "@/components/signup"
@@ -37,6 +38,14 @@ export default function HomePage() {
         bpm={bpm}
         onBack={() => setView("home")}
         onSelectSong={song => { setSelectedSong(song); setView("visualizer") }}
+      />
+    )
+  }
+
+  if (view === "data") {
+    return (
+      <DataView
+
       />
     )
   }
@@ -94,6 +103,20 @@ export default function HomePage() {
 
         {/* Arduino BPM component */}
         <ArduinoBpm onBpmConfirmed={handleBpmConfirmed} />
+        <div className="flex gap-3 w-full max-w-2xl mt-8">
+          {/*Implement Data Report*/}
+        <button 
+            className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
+            style={{
+                background: '#ff6b9d',
+                color: '#000',
+                borderColor: '#ff6b9d',
+                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
+                padding: '10px', 
+            }}>
+            LEARN MORE ABOUT OUR DATA
+         </button>
+         </div>
 
         {/* Footer note */}
         <div
