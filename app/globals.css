@@ -310,3 +310,29 @@ input[type="range"]::-moz-range-progress {
   transform: translate(4px, 4px);
   box-shadow: none !important;
 }
+
+/* styles/Login.module.css */
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #fff;
+  color: #111;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.input:hover {
+  border-color: #9ca3af;
+}
