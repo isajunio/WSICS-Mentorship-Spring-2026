@@ -7,8 +7,7 @@ import { SongsView } from "@/components/songs-view"
 import { VisualizerView } from "@/components/visualizer-view"
 import { DataView } from "@/components/data-view"
 import { PixelBackground } from "@/components/pixel-background"
-import { Login } from "@/components/login"
-import { Signup } from "@/components/signup"
+import Link from "next/link"; 
 import { type Song } from "@/lib/itunes"
 
 type View = "home" | "songs" | "visualizer" | "data"
@@ -57,28 +56,32 @@ export default function HomePage() {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 pt-24 pb-20 relative z-10">
         <div className="flex gap-3 w-full max-w-2xl mb-8">
-          <button 
-            className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
-            style={{
-                background: '#ff6b9d',
-                color: '#000',
-                borderColor: '#ff6b9d',
-                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
-                padding: '10px', 
-            }}>
-            LOGIN
-         </button>
-          <button 
-            className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
-            style={{
-                background: '#ff6b9d',
-                color: '#000',
-                borderColor: '#ff6b9d',
-                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
-                padding: '10px', 
-            }}>
-            SIGNUP
-         </button>
+          
+              <Link href="/login"
+                    className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
+                    style={{
+                      background: '#ff6b9d',
+                      color: '#000',
+                      borderColor: '#ff6b9d',
+                      boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
+                      padding: '10px', 
+                      justifyContent: 'center',
+                      alignItems:'center',
+                      display: 'flex'
+                    }}>LOGIN</Link>
+       
+          <Link href="/signup"
+                    className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
+                    style={{
+                      background: '#ff6b9d',
+                      color: '#000',
+                      borderColor: '#ff6b9d',
+                      boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
+                      padding: '10px', 
+                      justifyContent: 'center',
+                      alignItems:'center',
+                      display: 'flex'
+                    }}>SIGNUP</Link>
         </div>
         {/* Hero */}
         <div className="text-center mb-10 max-w-2xl">
