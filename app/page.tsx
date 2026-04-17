@@ -44,9 +44,7 @@ export default function HomePage() {
 
   if (view === "data") {
     return (
-      <DataView
-
-      />
+      <DataView  onBack={() => setView("home")} />
     )
   }
 
@@ -106,6 +104,7 @@ export default function HomePage() {
         <div className="flex gap-3 w-full max-w-2xl mt-8">
           {/*Implement Data Report*/}
         <button 
+            onClick={() => setView("data")}
             className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
             style={{
                 background: '#ff6b9d',
