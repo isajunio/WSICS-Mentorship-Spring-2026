@@ -10,6 +10,7 @@ export default function Signup() {
     const [ email, setEmail ] = useState("");
     const [ username, setUsername ] = useState("");
     const [ password, setPassword ] = useState("");
+    const [ errorMsg, setErrorMsg ] = useState("");
 
     const router = useRouter();
 
@@ -29,7 +30,7 @@ export default function Signup() {
          });
 
         if (error) {
-            console.error(error.message);
+            setErrorMsg(error.message)
             return;
         }
 
@@ -86,6 +87,9 @@ export default function Signup() {
                     onChange={(e)=>setPassword(e.target.value)}
                     required
                 />
+                {errorMsg && (
+                 <p className="font-mono text-xs text-red-500 mt-2">{errorMsg}</p>
+                )}
                 <button
                     type="submit"
                     className="pixel-btn w-full py-2 bg-[#ff6b9d] font-mono text-xs font-bold border-2 hover:bg-[#ffd93d] transition-colors"

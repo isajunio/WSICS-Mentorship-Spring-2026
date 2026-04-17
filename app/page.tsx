@@ -163,7 +163,7 @@ useEffect(() => {
             }}>
             LEARN MORE ABOUT OUR DATA
          </button>
-         <button 
+         {profile && <button 
             className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
             style={{
                 background: '#ff6b9d',
@@ -174,7 +174,7 @@ useEffect(() => {
             }}
             onClick={handleLogout}>
             LOG OUT
-         </button>
+         </button>}
          </div>
 
         {/* Footer note */}

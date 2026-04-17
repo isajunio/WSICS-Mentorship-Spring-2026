@@ -9,6 +9,7 @@ export default function Login() {
    
     const [ username, setUsername ] = useState("");
     const [ password, setPassword ] = useState("");
+    const [ errorMsg, setErrorMsg ] = useState("");
     const router = useRouter();
 
     async function handleLogin (e) {
@@ -29,7 +30,7 @@ export default function Login() {
         });
 
         if (error) {
-            console.error(error.message);
+            setErrorMsg("Invalid login credentials")
             return;
         }
 
@@ -59,6 +60,9 @@ export default function Login() {
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 mt-4"
                         required
                     />
+                    {errorMsg && (
+                        <p className="font-mono text-xs text-red-500 mt-2">{errorMsg}</p>
+                    )}
                     <button
                         type="submit"
                         className="w-full mt-6 py-3 bg-[#ff6b9d] text-white font-semibold rounded-lg hover:bg-[#ffd93d] transition duration-200"
