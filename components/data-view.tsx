@@ -58,24 +58,47 @@ export function DataView({ onBack }: { onBack: () => void }) {
                     />
                 </div>
 
-                {/* RPubs Report */}
-                <div className="mb-12">
-                    <p style={{
-                        fontFamily: "'Press Start 2P', monospace",
-                        color: '#5dcaa5',
-                        fontSize: '8px',
-                        marginBottom: '10px'
-                    }}>
-                        DATA REPORT
-                    </p>
-                    <iframe
-                        src="https://drive.google.com/file/d/1U9Je-rYluaQNEmLyEHtavvAy3L2N5UK_/view?usp=sharing"
-                        width="100%"
-                        height="900px"
-                        style={{ border: '2px solid #5dcaa5', background: '#ffffff' }}
-                        title="RPubs Data Report"
-                    />
-                </div>
+               {/* RPubs Report */}
+<div className="mb-12">
+    <p style={{
+        fontFamily: "'Press Start 2P', monospace",
+        color: '#5dcaa5',
+        fontSize: '8px',
+        marginBottom: '10px'
+    }}>
+        DATA REPORT
+    </p>
+    <div style={{
+        border: '2px solid #5dcaa5',
+        background: '#1a1040',
+        padding: '40px',
+        textAlign: 'center'
+    }}>
+        <p style={{
+            fontFamily: "'Press Start 2P', monospace",
+            color: '#9f8fbf',
+            fontSize: '8px',
+            marginBottom: '20px',
+            lineHeight: '2'
+        }}>
+            Our full data report is hosted on RPubs.
+        </p>
+        <button
+            onClick={() => window.open('https://rpubs.com/starcollector/1422747', '_blank')}
+            style={{
+                fontFamily: "'Press Start 2P', monospace",
+                background: '#5dcaa5',
+                color: '#0f0c29',
+                border: 'none',
+                padding: '12px 24px',
+                fontSize: '9px',
+                cursor: 'pointer',
+                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)'
+            }}>
+            OPEN DATA REPORT ↗
+        </button>
+    </div>
+</div>
 
             </div>
             </main>
