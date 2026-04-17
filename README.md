@@ -63,6 +63,7 @@ No Arduino? No problem. Switch to **Manual Input**, enter your BPM using the `+`
 | Web Serial API | Arduino communication |
 | iTunes Search API | Song discovery |
 | Vercel Analytics | Usage tracking |
+| R Studio | User pulse comparer to existing data |
 
 ---
 
