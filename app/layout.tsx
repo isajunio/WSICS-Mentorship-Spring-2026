@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Press_Start_2P, VT323 } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { AuthProvider } from '@/context/AuthContext';
 import './globals.css'
 
 const pressStart2P = Press_Start_2P({ 
@@ -50,7 +51,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${pressStart2P.variable} ${vt323.variable} antialiased`}>
+        <AuthProvider>
         {children}
+        </AuthProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

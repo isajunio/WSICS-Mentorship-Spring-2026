@@ -11,6 +11,7 @@ import Link from "next/link";
 import { type Song } from "@/lib/itunes"
 import { supabase } from "@/lib/supabase-client"
 import { User } from "@supabase/supabase-js";
+import { useAuth } from "@/context/AuthContext"
 
 
 type View = "home" | "songs" | "visualizer" | "data"
@@ -19,27 +20,31 @@ export default function HomePage() {
   const [view,         setView]         = useState<View>("home")
   const [bpm,          setBpm]          = useState(72)
   const [selectedSong, setSelectedSong] = useState<Song | null>(null)
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [profile, setProfile] = useState(null);
   
   // fetch the user from supabase authentication
   // query "profiles" table by matching user id
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      if (user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      setProfile(profile);
+// Update your useEffect to depend on user from AuthContext
+useEffect(() => {
+  const fetchProfile = async () => {
+    if (!user) {
+      setProfile(null); // ← clears profile on logout
+      return;
     }
-    };
-    fetchUser();
-    
-  }, []);
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+    setProfile(profile);
+  };
+  fetchProfile();
+}, [user]); // ← re-runs when user changes (login/logout)
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    console.log("Logging out")
+  }
 
   const handleBpmConfirmed = (confirmedBpm: number) => {
     setBpm(confirmedBpm)
@@ -80,9 +85,17 @@ export default function HomePage() {
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 pt-24 pb-20 relative z-10">
         {profile ? 
-        <div>
-          <p>Welcome {profile.username}</p>
-        </div>
+        <h1
+            className="text-3xl md:text-5xl font-mono font-bold leading-tight mb-6 text-balance"
+            style={{
+              background: 'linear-gradient(180deg, #ffd93d 0%, #ff8c42 50%, #ff6b9d 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              filter: 'drop-shadow(2px 2px 0 #000) drop-shadow(-1px -1px 0 #000)',
+            }}
+          >
+            Welcome {profile.username}!
+          </h1>
         : 
         <div className="flex gap-3 w-full max-w-2xl mb-8">
           <Link href="/login"
@@ -149,6 +162,18 @@ export default function HomePage() {
                 padding: '10px', 
             }}>
             LEARN MORE ABOUT OUR DATA
+         </button>
+         <button 
+            className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
+            style={{
+                background: '#ff6b9d',
+                color: '#000',
+                borderColor: '#ff6b9d',
+                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
+                padding: '10px', 
+            }}
+            onClick={handleLogout}>
+            LOG OUT
          </button>
          </div>
 
