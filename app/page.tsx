@@ -10,7 +10,6 @@ import { PixelBackground } from "@/components/pixel-background"
 import Link from "next/link"; 
 import { type Song } from "@/lib/itunes"
 import { supabase } from "@/lib/supabase-client"
-import { User } from "@supabase/supabase-js";
 import { useAuth } from "@/context/AuthContext"
 
 
@@ -40,11 +39,29 @@ useEffect(() => {
     setProfile(profile);
   };
   fetchProfile();
-}, [user]); // ← re-runs when user changes (login/logout)
+  }, [user]); // ← re-runs when user changes (login/logout)
+
   async function handleLogout() {
     await supabase.auth.signOut()
     console.log("Logging out")
   }
+
+  const handleSelectSong = async (song: Song) => {
+    setSelectedSong(song);
+    setView("visualizer");
+
+    if (user) {
+      await supabase.from("listened_songs").insert({
+        user_id: user.id,
+        song_title: song.title,
+        artist: song.artist,
+        album: song.album,
+        album_art: song.albumArt,
+        bpm: song.bpm,
+        user_bpm: bpm, // the bpm state from ArduinoBpm
+      });
+    }
+  };
 
   const handleBpmConfirmed = (confirmedBpm: number) => {
     setBpm(confirmedBpm)
@@ -65,7 +82,7 @@ useEffect(() => {
       <SongsView
         bpm={bpm}
         onBack={() => setView("home")}
-        onSelectSong={song => { setSelectedSong(song); setView("visualizer") }}
+        onSelectSong={song => { setSelectedSong(song); setView("visualizer"); handleSelectSong(song) }}
       />
     )
   }
@@ -150,6 +167,23 @@ useEffect(() => {
 
         {/* Arduino BPM component */}
         <ArduinoBpm onBpmConfirmed={handleBpmConfirmed} />
+        {profile && <div className="flex gap-3 w-full max-w-2xl mt-8">
+          <Link href="/dashboard"
+              className="pixel-btn w-full py-2 font-mono text-xs font-bold border-2 transition-colors"
+              style={{
+                background: '#ff6b9d',
+                color: '#000',
+                borderColor: '#ff6b9d',
+                boxShadow: '3px 3px 0 rgba(0,0,0,0.4)',
+                padding: '10px', 
+                justifyContent: 'center',
+                alignItems:'center',
+                display: 'flex'
+                }}>
+                VIEW YOUR DASHBOARD
+          </Link>
+        </div>
+        }
         <div className="flex gap-3 w-full max-w-2xl mt-8">
           {/*Implement Data Report*/}
         <button 
@@ -174,7 +208,8 @@ useEffect(() => {
             }}
             onClick={handleLogout}>
             LOG OUT
-         </button>}
+          </button>
+         }  
          </div>
 
         {/* Footer note */}
