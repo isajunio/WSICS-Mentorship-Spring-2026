@@ -64,7 +64,7 @@ export function DataView({ onBack }: { onBack: () => void }) {
                         DATA REPORT
                     </p>
                     <iframe
-                        src="https://rpubs.com/starcollector/1422747"
+                        src="https://drive.google.com/file/d/1U9Je-rYluaQNEmLyEHtavvAy3L2N5UK_/view?usp=sharing"
                         width="100%"
                         height="900px"
                         style={{ border: '2px solid #5dcaa5', background: '#ffffff' }}
