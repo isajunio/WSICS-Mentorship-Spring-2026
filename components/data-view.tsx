@@ -1,10 +1,15 @@
+"use client"
+
+import { PixelBackground } from "./pixel-background"
+
 interface DataViewProps {
   onBack: () => void
 }
 export function DataView({ onBack }: { onBack: () => void }) {
     return (
         <div className="min-h-screen w-full" style={{ background: '#0f0c29' }}>
-
+                <PixelBackground />
+            <main className="flex-1 flex flex-col items-center justify-center px-4 pt-24 pb-20 relative z-10">
             {/* Back button */}
             <div className="text-center py-6">
                 <button
@@ -73,6 +78,7 @@ export function DataView({ onBack }: { onBack: () => void }) {
                 </div>
 
             </div>
+            </main>
         </div>
     )
 }
